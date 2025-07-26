@@ -25,3 +25,9 @@ Recomiéndame los pasos a seguir para obtener un output no sólo de la aplicacac
 
 #PROMPT 3
 Sí, ejecuta la fase 1 del proyecto: estructura base
+
+#PROMPT 4
+He probado la estructura de fase 1 y me parece correcta para seguir avanzando. Procece con la fase 2: Funcionalidad Core
+
+#PROMPT 5
+He probado las funcionalidades actuales y son correctas. Continua con la fase 3

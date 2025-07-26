@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demo - Funcionalidades Retro Timer</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+            color: #00ff00;
+            padding: 20px;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        .demo-container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        .demo-section {
+            margin: 30px 0;
+            padding: 20px;
+            border: 2px solid #00ff00;
+            border-radius: 12px;
+            background: rgba(0, 255, 0, 0.05);
+        }
+        .demo-title {
+            font-size: 2.5rem;
+            text-align: center;
+            margin-bottom: 30px;
+            text-shadow: 0 0 20px #00ff00;
+            letter-spacing: 3px;
+        }
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .feature-card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid rgba(0, 255, 0, 0.3);
+        }
+        .feature-title {
+            color: #ffa500;
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+            text-shadow: 0 0 10px currentColor;
+        }
+        .demo-btn {
+            background: transparent;
+            border: 2px solid #00ff00;
+            color: #00ff00;
+            padding: 12px 24px;
+            margin: 10px 5px;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+            font-family: inherit;
+            font-size: 1rem;
+        }
+        .demo-btn:hover {
+            background: #00ff00;
+            color: #0a0a0a;
+            box-shadow: 0 0 20px #00ff00;
+            transform: translateY(-2px);
+        }
+        .demo-btn.secondary {
+            border-color: #ffa500;
+            color: #ffa500;
+        }
+        .demo-btn.secondary:hover {
+            background: #ffa500;
+            color: #0a0a0a;
+            box-shadow: 0 0 20px #ffa500;
+        }
+        .demo-btn.tertiary {
+            border-color: #00ffff;
+            color: #00ffff;
+        }
+        .demo-btn.tertiary:hover {
+            background: #00ffff;
+            color: #0a0a0a;
+            box-shadow: 0 0 20px #00ffff;
+        }
+        .keyboard-demo {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        .key-combo {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 5px 10px;
+            margin: 3px;
+            border-radius: 4px;
+            font-weight: bold;
+            color: #ffa500;
+        }
+        .stats-preview {
+            background: rgba(0, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #00ffff;
+        }
+        .highlight {
+            color: #ff00ff;
+            font-weight: bold;
+            text-shadow: 0 0 10px currentColor;
+        }
+        .emoji {
+            font-size: 1.5rem;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <h1 class="demo-title">🕰️ RETRO TIMER DEMO</h1>
+
+        <div class="demo-section">
+            <h2><span class="emoji">🚀</span>Funcionalidades Completadas</h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h3 class="feature-title">⏱️ Multi-Timers</h3>
+                    <p>Hasta <span class="highlight">3 timers simultáneos</span> independientes</p>
+                    <p>✅ Cronómetros (MM:SS.ms)</p>
+                    <p>✅ Cuentas regresivas configurables</p>
+                    <p>✅ Estados visuales en tiempo real</p>
+                </div>
+                <div class="feature-card">
+                    <h3 class="feature-title">🎵 Sonidos Graciosos</h3>
+                    <p><span class="highlight">3 tipos de alertas</span> creadas con Web Audio API</p>
+                    <p>🎼 Ta-da! (musical)</p>
+                    <p>🎮 Retro Game (8-bit)</p>
+                    <p>🔊 Boing (cómico)</p>
+                    <p>🔀 Selección aleatoria automática</p>
+                </div>
+                <div class="feature-card">
+                    <h3 class="feature-title">⌨️ Atajos de Teclado</h3>
+                    <p>Control completo sin mouse</p>
+                    <div class="keyboard-demo">
+                        <span class="key-combo">S</span> Cronómetro<br>
+                        <span class="key-combo">C</span> Cuenta Regresiva<br>
+                        <span class="key-combo">SPACE</span> Play/Pause<br>
+                        <span class="key-combo">R</span> Reset Todo<br>
+                        <span class="key-combo">E</span> Exportar CSV<br>
+                        <span class="key-combo">DEL</span> Eliminar último
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <h3 class="feature-title">📊 Estadísticas</h3>
+                    <p>Seguimiento completo de uso con <span class="highlight">persistencia local</span></p>
+                    <div class="stats-preview">
+                        📈 Total de cronómetros<br>
+                        ⏰ Total de cuentas regresivas<br>
+                        ⏱️ Tiempo total acumulado<br>
+                        🏆 Sesión más larga<br>
+                        📊 Tiempo promedio<br>
+                        💾 Exportación a CSV
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <h3 class="feature-title">🔔 Notificaciones</h3>
+                    <p><span class="highlight">Sistema completo de alertas</span></p>
+                    <p>🌐 Notificaciones del navegador</p>
+                    <p>🎵 Sonidos automáticos</p>
+                    <p>📱 Toast messages temporales</p>
+                    <p>🚨 Alertas visuales críticas</p>
+                </div>
+                <div class="feature-card">
+                    <h3 class="feature-title">🖥️ Modo Pantalla Completa</h3>
+                    <p>Vista inmersiva para timers</p>
+                    <p>👆 <span class="highlight">Doble clic</span> en cualquier timer</p>
+                    <p>📱 Optimizado para presentaciones</p>
+                    <p>🎮 Controles integrados</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h2><span class="emoji">🎨</span>Características de Diseño</h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h3 class="feature-title">🌈 Diseño Retro</h3>
+                    <p>✨ Efectos neón y glow</p>
+                    <p>🎯 Paleta de colores vibrante</p>
+                    <p>🔄 Animaciones suaves</p>
+                    <p>📱 Completamente responsive</p>
+                </div>
+                <div class="feature-card">
+                    <h3 class="feature-title">🎯 UX Avanzada</h3>
+                    <p>📍 Indicadores de estado visuales</p>
+                    <p>⚡ Feedback inmediato</p>
+                    <p>🎭 Transiciones fluidas</p>
+                    <p>♿ Accesibilidad básica</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h2><span class="emoji">⚡</span>Tecnologías Utilizadas</h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h3 class="feature-title">💻 Frontend</h3>
+                    <p>🌐 Vanilla HTML5</p>
+                    <p>🎨 CSS3 con Variables y Grid</p>
+                    <p>⚡ JavaScript ES6+ (Clases)</p>
+                    <p>🔊 Web Audio API</p>
+                    <p>💾 LocalStorage</p>
+                </div>
+                <div class="feature-card">
+                    <h3 class="feature-title">🏗️ Arquitectura</h3>
+                    <p>🧩 Diseño modular</p>
+                    <p>📦 Separación de responsabilidades</p>
+                    <p>🔄 Patrón Observer</p>
+                    <p>⚙️ Configuración centralizada</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h2><span class="emoji">🚀</span>Prueba la Aplicación</h2>
+            <div style="text-align: center; margin: 30px 0;">
+                <a href="index.html" class="demo-btn">
+                    🎯 Abrir Aplicación Principal
+                </a>
+                <a href="test-functionality.html" class="demo-btn secondary">
+                    🧪 Página de Pruebas
+                </a>
+                <button class="demo-btn tertiary" onclick="playDemoSound()">
+                    🔊 Probar Sonidos
+                </button>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h2><span class="emoji">📋</span>Instrucciones de Uso</h2>
+            <div style="background: rgba(0, 0, 0, 0.3); padding: 20px; border-radius: 8px;">
+                <h3 style="color: #ffa500; margin-bottom: 15px;">🎮 Controles Básicos:</h3>
+                <ol style="color: #cccccc; line-height: 2;">
+                    <li>Presiona <span class="key-combo">S</span> para crear un cronómetro</li>
+                    <li>Presiona <span class="key-combo">C</span> para crear una cuenta regresiva</li>
+                    <li>Usa <span class="key-combo">SPACE</span> para controlar el último timer</li>
+                    <li>Haz <span class="highlight">doble clic</span> en cualquier timer para modo pantalla completa</li>
+                    <li>Presiona <span class="key-combo">?</span> (botón ayuda) para ver estadísticas</li>
+                    <li>Presiona <span class="key-combo">E</span> para exportar todos los tiempos a CSV</li>
+                </ol>
+            </div>
+        </div>
+
+        <footer style="text-align: center; margin-top: 50px; color: #666;">
+            <p>🕰️ Retro Timer v3.0 - Fase 3 Completada</p>
+            <p>Tecnología Vintage para el Futuro ✨</p>
+        </footer>
+    </div>
+
+    <script src="assets/alert-generator.js"></script>
+    <script>
+        function playDemoSound() {
+            try {
+                const generator = new AlertSoundGenerator();
+                generator.playRandomFunnySound();
+                
+                // Mostrar mensaje temporal
+                const msg = document.createElement('div');
+                msg.textContent = '🎵 ¡Sonido reproducido!';
+                msg.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    background: #00ff00;
+                    color: #000;
+                    padding: 15px 25px;
+                    border-radius: 8px;
+                    font-weight: bold;
+                    z-index: 10000;
+                    animation: slideIn 0.3s ease;
+                `;
+                document.body.appendChild(msg);
+                setTimeout(() => msg.remove(), 2000);
+            } catch (e) {
+                alert('Error reproduciendo sonido: ' + e.message);
+            }
+        }
+
+        // Animación para el título
+        let titleHue = 0;
+        setInterval(() => {
+            titleHue = (titleHue + 1) % 360;
+            const title = document.querySelector('.demo-title');
+            if (title) {
+                title.style.color = `hsl(${titleHue}, 100%, 50%)`;
+            }
+        }, 100);
+
+        // CSS animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html> 

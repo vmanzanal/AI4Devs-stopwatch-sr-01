@@ -325,6 +325,9 @@ class TimerManager {
         this.timers = new Map();
         this.nextId = 1;
         this.notificationService = new NotificationService();
+        this.keyboardManager = new KeyboardManager(this);
+        this.statsManager = new StatsManager();
+        this.settingsManager = new SettingsManager();
         
         // Referencias DOM
         this.timersContainer = document.getElementById('timers-container');
@@ -340,6 +343,8 @@ class TimerManager {
 
     init() {
         this.bindEvents();
+        this.settingsManager.applySettings();
+        this.setupHelpSystem();
         this.updateUI();
     }
 
@@ -358,8 +363,40 @@ class TimerManager {
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
                 this.hideCountdownModal();
+                this.hideStatsPanel();
             }
         });
+
+        // Panel de estadísticas
+        document.getElementById('help-button')?.addEventListener('click', () => this.showStatsPanel());
+        document.getElementById('close-stats')?.addEventListener('click', () => this.hideStatsPanel());
+        document.getElementById('clear-stats')?.addEventListener('click', () => this.clearStats());
+        document.getElementById('export-stats')?.addEventListener('click', () => this.exportStats());
+
+        // Mostrar/ocultar atajos de teclado
+        let keyboardHintsTimeout;
+        document.addEventListener('keydown', () => {
+            const hints = document.getElementById('keyboard-hints');
+            if (hints && !hints.classList.contains('visible')) {
+                hints.classList.add('visible');
+                clearTimeout(keyboardHintsTimeout);
+                keyboardHintsTimeout = setTimeout(() => {
+                    hints.classList.remove('visible');
+                }, 3000);
+            }
+        });
+    }
+
+    /**
+     * Configura el sistema de ayuda
+     */
+    setupHelpSystem() {
+        // Mostrar ayuda inicial después de 3 segundos
+        setTimeout(() => {
+            if (this.timers.size === 0) {
+                this.showToast('Presiona ? para ver ayuda y estadísticas', 'info');
+            }
+        }, 3000);
     }
 
     /**
@@ -467,9 +504,10 @@ class TimerManager {
         div.innerHTML = `
             <div class="timer-header">
                 <h3 class="timer-title ${titleClass}">${title} ${timer.id}</h3>
+                <div class="timer-status" id="status-${timer.id}"></div>
                 <button class="timer-close" onclick="app.removeTimer(${timer.id})">✖</button>
             </div>
-            <div class="timer-display ${displayClass}" id="display-${timer.id}">
+            <div class="timer-display ${displayClass}" id="display-${timer.id}" ondblclick="app.toggleFullscreen(${timer.id})">
                 ${Timer.formatTime(timer.currentTime)}
             </div>
             <div class="timer-controls">
@@ -508,10 +546,47 @@ class TimerManager {
     removeTimer(id) {
         const timer = this.timers.get(id);
         if (timer) {
+            // Registrar estadísticas antes de eliminar
+            this.statsManager.recordTimer(timer);
+            
             timer.destroy();
             this.timers.delete(id);
             this.updateUI();
+            
+            // Mostrar mensaje de confirmación
+            this.showToast(`Timer ${id} eliminado`);
         }
+    }
+
+    /**
+     * Muestra un mensaje toast temporal
+     */
+    showToast(message, type = 'info') {
+        const toast = document.createElement('div');
+        toast.className = `toast toast-${type}`;
+        toast.textContent = message;
+        
+        Object.assign(toast.style, {
+            position: 'fixed',
+            top: '20px',
+            right: '20px',
+            padding: '12px 20px',
+            background: type === 'success' ? '#00ff00' : 
+                       type === 'error' ? '#ff0040' : '#ffa500',
+            color: '#000',
+            borderRadius: '8px',
+            zIndex: '10000',
+            animation: 'slideInRight 0.3s ease',
+            fontFamily: 'var(--font-controls)',
+            fontWeight: '600'
+        });
+        
+        document.body.appendChild(toast);
+        
+        setTimeout(() => {
+            toast.style.animation = 'slideOutRight 0.3s ease';
+            setTimeout(() => toast.remove(), 300);
+        }, 2000);
     }
 
     /**
@@ -556,6 +631,12 @@ class TimerManager {
         const startBtn = timerElement.querySelector('.timer-btn.start');
         const pauseBtn = timerElement.querySelector('.timer-btn.pause');
         const resetBtn = timerElement.querySelector('.timer-btn.reset');
+        const statusIndicator = document.getElementById(`status-${timer.id}`);
+        
+        // Actualizar indicador de estado
+        if (statusIndicator) {
+            statusIndicator.className = `timer-status ${state}`;
+        }
         
         // Resetear estados
         startBtn.disabled = false;
@@ -580,6 +661,71 @@ class TimerManager {
                 startBtn.disabled = true;
                 pauseBtn.disabled = true;
                 break;
+        }
+    }
+
+    /**
+     * Alterna modo pantalla completa para un timer
+     */
+    toggleFullscreen(id) {
+        const timer = this.timers.get(id);
+        if (!timer || !timer.element) return;
+
+        const existing = document.querySelector('.timer-fullscreen');
+        if (existing) {
+            existing.remove();
+            return;
+        }
+
+        const fullscreenDiv = document.createElement('div');
+        fullscreenDiv.className = 'timer-fullscreen';
+        fullscreenDiv.innerHTML = `
+            <h2>${timer.type === 'stopwatch' ? 'Cronómetro' : 'Cuenta Regresiva'} ${timer.id}</h2>
+            <div class="timer-display ${timer.type === 'countdown' ? 'countdown' : ''}" id="fullscreen-display-${timer.id}">
+                ${Timer.formatTime(timer.currentTime)}
+            </div>
+            <div class="timer-controls">
+                <button class="timer-btn start" onclick="app.startTimer(${timer.id}); app.updateFullscreenControls(${timer.id})">Start</button>
+                <button class="timer-btn pause" onclick="app.pauseTimer(${timer.id}); app.updateFullscreenControls(${timer.id})" disabled>Pause</button>
+                <button class="timer-btn reset" onclick="app.resetTimer(${timer.id}); app.updateFullscreenControls(${timer.id})">Reset</button>
+                <button class="timer-btn" onclick="document.querySelector('.timer-fullscreen').remove()" style="border-color: var(--neon-red); color: var(--neon-red);">Salir</button>
+            </div>
+        `;
+
+        document.body.appendChild(fullscreenDiv);
+        this.updateFullscreenControls(id);
+
+        // Actualizar display en tiempo real
+        timer.onUpdate = (time) => {
+            this.updateTimerDisplay(timer, time);
+            const fullscreenDisplay = document.getElementById(`fullscreen-display-${timer.id}`);
+            if (fullscreenDisplay) {
+                fullscreenDisplay.textContent = Timer.formatTime(time);
+                if (timer.type === 'countdown') {
+                    fullscreenDisplay.classList.toggle('warning', timer.isCritical());
+                }
+            }
+        };
+    }
+
+    /**
+     * Actualiza controles en modo pantalla completa
+     */
+    updateFullscreenControls(id) {
+        const timer = this.timers.get(id);
+        const fullscreen = document.querySelector('.timer-fullscreen');
+        if (!timer || !fullscreen) return;
+
+        const startBtn = fullscreen.querySelector('.timer-btn.start');
+        const pauseBtn = fullscreen.querySelector('.timer-btn.pause');
+
+        if (timer.isRunning) {
+            startBtn.disabled = true;
+            pauseBtn.disabled = false;
+        } else {
+            startBtn.disabled = false;
+            pauseBtn.disabled = true;
+            startBtn.textContent = timer.isPaused ? 'Resume' : 'Start';
         }
     }
 
@@ -623,6 +769,286 @@ class TimerManager {
         if (this.emptyState) {
             this.emptyState.classList.toggle('hidden', timerCount > 0);
         }
+    }
+
+    /**
+     * Muestra el panel de estadísticas
+     */
+    showStatsPanel() {
+        const panel = document.getElementById('stats-panel');
+        if (!panel) return;
+
+        const stats = this.statsManager.getStats();
+        
+        document.getElementById('total-stopwatches').textContent = stats.totalStopwatches;
+        document.getElementById('total-countdowns').textContent = stats.totalCountdowns;
+        document.getElementById('total-time').textContent = Timer.formatTime(stats.totalTime);
+        document.getElementById('longest-session').textContent = Timer.formatTime(stats.longestSession);
+
+        panel.classList.remove('hidden');
+    }
+
+    /**
+     * Oculta el panel de estadísticas
+     */
+    hideStatsPanel() {
+        const panel = document.getElementById('stats-panel');
+        if (panel) {
+            panel.classList.add('hidden');
+        }
+    }
+
+    /**
+     * Limpia las estadísticas
+     */
+    clearStats() {
+        if (confirm('¿Estás seguro de que quieres limpiar todas las estadísticas?')) {
+            this.statsManager.clearStats();
+            this.showStatsPanel(); // Refrescar vista
+            this.showToast('Estadísticas limpiadas', 'success');
+        }
+    }
+
+    /**
+     * Exporta las estadísticas
+     */
+    exportStats() {
+        const stats = this.statsManager.getStats();
+        const csvContent = `Estadística,Valor
+Cronómetros Totales,${stats.totalStopwatches}
+Cuentas Regresivas Totales,${stats.totalCountdowns}
+Tiempo Total,${Timer.formatTime(stats.totalTime)}
+Sesión Más Larga,${Timer.formatTime(stats.longestSession)}
+Tiempo Promedio,${Timer.formatTime(stats.averageTime)}
+Total de Sesiones,${stats.totalSessions}`;
+
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        link.setAttribute('href', url);
+        link.setAttribute('download', `retro-timer-stats-${new Date().toISOString().split('T')[0]}.csv`);
+        link.style.visibility = 'hidden';
+        
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        this.showToast('Estadísticas exportadas', 'success');
+    }
+}
+
+// ============================
+// GESTOR DE ATAJOS DE TECLADO
+// ============================
+
+/**
+ * Maneja atajos de teclado para la aplicación
+ */
+class KeyboardManager {
+    constructor(timerManager) {
+        this.timerManager = timerManager;
+        this.init();
+    }
+
+    init() {
+        document.addEventListener('keydown', (e) => {
+            // Solo procesar atajos si no estamos escribiendo en un input
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+                return;
+            }
+
+            switch (e.key.toLowerCase()) {
+                case 's':
+                    e.preventDefault();
+                    this.timerManager.createStopwatch();
+                    break;
+                case 'c':
+                    e.preventDefault();
+                    this.timerManager.showCountdownModal();
+                    break;
+                case 'e':
+                    e.preventDefault();
+                    this.timerManager.exportTimes();
+                    break;
+                case ' ':
+                    e.preventDefault();
+                    this.toggleLastTimer();
+                    break;
+                case 'r':
+                    e.preventDefault();
+                    this.resetAllTimers();
+                    break;
+                case 'delete':
+                case 'backspace':
+                    e.preventDefault();
+                    this.removeLastTimer();
+                    break;
+            }
+        });
+    }
+
+    toggleLastTimer() {
+        const timers = Array.from(this.timerManager.timers.values());
+        if (timers.length === 0) return;
+        
+        const lastTimer = timers[timers.length - 1];
+        if (lastTimer.isRunning) {
+            this.timerManager.pauseTimer(lastTimer.id);
+        } else {
+            this.timerManager.startTimer(lastTimer.id);
+        }
+    }
+
+    resetAllTimers() {
+        this.timerManager.timers.forEach(timer => {
+            this.timerManager.resetTimer(timer.id);
+        });
+    }
+
+    removeLastTimer() {
+        const timers = Array.from(this.timerManager.timers.values());
+        if (timers.length === 0) return;
+        
+        const lastTimer = timers[timers.length - 1];
+        this.timerManager.removeTimer(lastTimer.id);
+    }
+}
+
+// ============================
+// GESTOR DE ESTADÍSTICAS
+// ============================
+
+/**
+ * Calcula y muestra estadísticas de uso
+ */
+class StatsManager {
+    constructor() {
+        this.stats = {
+            totalStopwatches: 0,
+            totalCountdowns: 0,
+            totalTime: 0,
+            longestSession: 0,
+            sessions: []
+        };
+        this.loadStats();
+    }
+
+    loadStats() {
+        try {
+            const saved = localStorage.getItem('retro-timer-stats');
+            if (saved) {
+                this.stats = { ...this.stats, ...JSON.parse(saved) };
+            }
+        } catch (e) {
+            console.warn('No se pudieron cargar las estadísticas:', e);
+        }
+    }
+
+    saveStats() {
+        try {
+            localStorage.setItem('retro-timer-stats', JSON.stringify(this.stats));
+        } catch (e) {
+            console.warn('No se pudieron guardar las estadísticas:', e);
+        }
+    }
+
+    recordTimer(timer) {
+        const session = {
+            type: timer.type,
+            duration: timer.currentTime,
+            date: new Date().toISOString()
+        };
+
+        this.stats.sessions.push(session);
+        
+        if (timer.type === 'stopwatch') {
+            this.stats.totalStopwatches++;
+            this.stats.totalTime += timer.currentTime;
+            if (timer.currentTime > this.stats.longestSession) {
+                this.stats.longestSession = timer.currentTime;
+            }
+        } else {
+            this.stats.totalCountdowns++;
+        }
+
+        this.saveStats();
+    }
+
+    getStats() {
+        return {
+            ...this.stats,
+            averageTime: this.stats.totalStopwatches > 0 ? 
+                this.stats.totalTime / this.stats.totalStopwatches : 0,
+            totalSessions: this.stats.sessions.length
+        };
+    }
+
+    clearStats() {
+        this.stats = {
+            totalStopwatches: 0,
+            totalCountdowns: 0,
+            totalTime: 0,
+            longestSession: 0,
+            sessions: []
+        };
+        this.saveStats();
+    }
+}
+
+// ============================
+// GESTOR DE CONFIGURACIÓN
+// ============================
+
+/**
+ * Maneja la configuración de la aplicación
+ */
+class SettingsManager {
+    constructor() {
+        this.settings = {
+            theme: 'dark',
+            soundEnabled: true,
+            notificationsEnabled: true,
+            autoExport: false,
+            precision: 100 // ms
+        };
+        this.loadSettings();
+    }
+
+    loadSettings() {
+        try {
+            const saved = localStorage.getItem('retro-timer-settings');
+            if (saved) {
+                this.settings = { ...this.settings, ...JSON.parse(saved) };
+            }
+        } catch (e) {
+            console.warn('No se pudieron cargar las configuraciones:', e);
+        }
+    }
+
+    saveSettings() {
+        try {
+            localStorage.setItem('retro-timer-settings', JSON.stringify(this.settings));
+        } catch (e) {
+            console.warn('No se pudieron guardar las configuraciones:', e);
+        }
+    }
+
+    updateSetting(key, value) {
+        this.settings[key] = value;
+        this.saveSettings();
+        this.applySettings();
+    }
+
+    applySettings() {
+        // Aplicar tema
+        document.body.classList.toggle('light-theme', this.settings.theme === 'light');
+        
+        // Actualizar configuración global
+        CONFIG.UPDATE_INTERVAL = this.settings.precision;
+    }
+
+    getSettings() {
+        return { ...this.settings };
     }
 }
 

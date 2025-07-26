@@ -75,6 +75,54 @@
         </footer>
     </div>
 
+    <!-- Panel de Estadísticas -->
+    <div id="stats-panel" class="stats-panel hidden">
+        <div class="modal-header">
+            <h3>📊 Estadísticas de Uso</h3>
+            <button id="close-stats" class="close-btn">✖</button>
+        </div>
+        <div class="stats-grid">
+            <div class="stat-item">
+                <div class="stat-value" id="total-stopwatches">0</div>
+                <div class="stat-label">Cronómetros</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="total-countdowns">0</div>
+                <div class="stat-label">Cuentas Regresivas</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="total-time">00:00.00</div>
+                <div class="stat-label">Tiempo Total</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="longest-session">00:00.00</div>
+                <div class="stat-label">Sesión Más Larga</div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button id="clear-stats" class="control-btn secondary">Limpiar</button>
+            <button id="export-stats" class="control-btn tertiary">Exportar</button>
+        </div>
+    </div>
+
+    <!-- Atajos de Teclado -->
+    <div id="keyboard-hints" class="keyboard-hints">
+        <h4>⌨️ Atajos de Teclado</h4>
+        <ul>
+            <li><span>Cronómetro</span> <span class="key">S</span></li>
+            <li><span>Cuenta Regresiva</span> <span class="key">C</span></li>
+            <li><span>Play/Pause</span> <span class="key">SPACE</span></li>
+            <li><span>Reset Todo</span> <span class="key">R</span></li>
+            <li><span>Exportar</span> <span class="key">E</span></li>
+            <li><span>Eliminar</span> <span class="key">DEL</span></li>
+        </ul>
+    </div>
+
+    <!-- Botón de Ayuda -->
+    <button id="help-button" class="help-button" title="Ayuda y Estadísticas">
+        ?
+    </button>
+
     <!-- Scripts -->
     <script src="assets/alert-generator.js"></script>
     <script src="script.js"></script>

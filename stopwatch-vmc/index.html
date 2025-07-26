@@ -11,21 +11,37 @@
 </head>
 <body>
     <div class="app-container">
+        <!-- Selector de Temas -->
+        <div class="theme-selector">
+            <h4>🎨 Temas</h4>
+            <div class="theme-buttons">
+                <button class="theme-btn dark active" onclick="app.changeTheme('dark')" title="Tema Oscuro"></button>
+                <button class="theme-btn light" onclick="app.changeTheme('light')" title="Tema Claro"></button>
+                <button class="theme-btn gaming" onclick="app.changeTheme('gaming')" title="Gaming Retro"></button>
+                <button class="theme-btn matrix" onclick="app.changeTheme('matrix')" title="Matrix"></button>
+                <button class="theme-btn ocean" onclick="app.changeTheme('ocean')" title="Ocean"></button>
+                <button class="theme-btn sunset" onclick="app.changeTheme('sunset')" title="Sunset"></button>
+            </div>
+        </div>
+
+        <!-- Partículas de fondo -->
+        <div class="particles" id="particles-container"></div>
+
         <!-- Header -->
         <header class="app-header">
-            <h1 class="app-title">⏱️ RETRO TIMER</h1>
+            <h1 class="app-title neon-glow typing-effect">⏱️ RETRO TIMER</h1>
             <p class="app-subtitle">Cronómetro y Cuenta Regresiva</p>
         </header>
 
         <!-- Control Panel -->
         <div class="control-panel">
-            <button id="add-stopwatch" class="control-btn primary" disabled>
+            <button id="add-stopwatch" class="control-btn primary ripple-effect microinteraction" disabled>
                 ➕ Agregar Cronómetro
             </button>
-            <button id="add-countdown" class="control-btn secondary" disabled>
+            <button id="add-countdown" class="control-btn secondary ripple-effect microinteraction" disabled>
                 ⏰ Agregar Cuenta Regresiva
             </button>
-            <button id="export-times" class="control-btn tertiary" disabled>
+            <button id="export-times" class="control-btn tertiary ripple-effect microinteraction" disabled>
                 📊 Exportar CSV
             </button>
             <div class="timer-counter">

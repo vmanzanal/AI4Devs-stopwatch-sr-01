@@ -880,3 +880,444 @@ body.light-theme .control-panel {
         font-size: 4rem;
     }
 } 
+
+/* ============================
+   SISTEMA DE TEMAS AVANZADO
+   ============================ */
+
+/* Variables para temas dinámicos */
+:root {
+    /* Tema Oscuro (default) */
+    --theme-bg-primary: #0a0a0a;
+    --theme-bg-secondary: #1a1a1a;
+    --theme-bg-tertiary: #2a2a2a;
+    --theme-primary: #00ff00;
+    --theme-secondary: #ffa500;
+    --theme-accent: #00ffff;
+    --theme-danger: #ff0040;
+    --theme-text: #ffffff;
+    --theme-text-muted: #666666;
+}
+
+/* Tema Gaming Retro */
+body.gaming-theme {
+    --theme-bg-primary: #0f0023;
+    --theme-bg-secondary: #1a0040;
+    --theme-bg-tertiary: #2d0070;
+    --theme-primary: #ff00ff;
+    --theme-secondary: #00ffff;
+    --theme-accent: #ffff00;
+    --theme-danger: #ff4040;
+    --theme-text: #ffffff;
+    --theme-text-muted: #9999ff;
+}
+
+body.gaming-theme::before {
+    background: 
+        radial-gradient(circle at 20% 20%, rgba(255, 0, 255, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(0, 255, 255, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 50% 50%, rgba(255, 255, 0, 0.08) 0%, transparent 50%);
+}
+
+/* Tema Matrix */
+body.matrix-theme {
+    --theme-bg-primary: #000000;
+    --theme-bg-secondary: #001100;
+    --theme-bg-tertiary: #002200;
+    --theme-primary: #00ff41;
+    --theme-secondary: #008f11;
+    --theme-accent: #00ff88;
+    --theme-danger: #ff0000;
+    --theme-text: #00ff41;
+    --theme-text-muted: #004400;
+}
+
+body.matrix-theme::before {
+    background: 
+        radial-gradient(circle at 25% 25%, rgba(0, 255, 65, 0.1) 0%, transparent 60%),
+        radial-gradient(circle at 75% 75%, rgba(0, 143, 17, 0.1) 0%, transparent 60%);
+}
+
+/* Tema Ocean */
+body.ocean-theme {
+    --theme-bg-primary: #001122;
+    --theme-bg-secondary: #002244;
+    --theme-bg-tertiary: #003366;
+    --theme-primary: #00ddff;
+    --theme-secondary: #0099cc;
+    --theme-accent: #66ffcc;
+    --theme-danger: #ff6666;
+    --theme-text: #e6f7ff;
+    --theme-text-muted: #668899;
+}
+
+body.ocean-theme::before {
+    background: 
+        radial-gradient(circle at 30% 30%, rgba(0, 221, 255, 0.12) 0%, transparent 50%),
+        radial-gradient(circle at 70% 70%, rgba(102, 255, 204, 0.08) 0%, transparent 50%);
+}
+
+/* Tema Sunset */
+body.sunset-theme {
+    --theme-bg-primary: #2d1b30;
+    --theme-bg-secondary: #4a2c54;
+    --theme-bg-tertiary: #663d78;
+    --theme-primary: #ff6b9d;
+    --theme-secondary: #ffa726;
+    --theme-accent: #ffeb3b;
+    --theme-danger: #f44336;
+    --theme-text: #fff3e0;
+    --theme-text-muted: #9c7aa0;
+}
+
+body.sunset-theme::before {
+    background: 
+        radial-gradient(circle at 40% 40%, rgba(255, 107, 157, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 60% 60%, rgba(255, 167, 38, 0.12) 0%, transparent 50%);
+}
+
+/* Aplicar variables de tema a elementos */
+.timer-card {
+    background: linear-gradient(145deg, var(--theme-bg-secondary), var(--theme-bg-tertiary));
+}
+
+.timer-display {
+    color: var(--theme-primary);
+    border-color: var(--theme-primary);
+}
+
+.timer-display.countdown {
+    color: var(--theme-secondary);
+    border-color: var(--theme-secondary);
+}
+
+.control-btn.primary {
+    border-color: var(--theme-primary);
+    color: var(--theme-primary);
+}
+
+.control-btn.primary:hover:not(:disabled) {
+    background: var(--theme-primary);
+    box-shadow: 0 0 20px var(--theme-primary);
+}
+
+.control-btn.secondary {
+    border-color: var(--theme-secondary);
+    color: var(--theme-secondary);
+}
+
+.control-btn.secondary:hover:not(:disabled) {
+    background: var(--theme-secondary);
+    box-shadow: 0 0 20px var(--theme-secondary);
+}
+
+.control-btn.tertiary {
+    border-color: var(--theme-accent);
+    color: var(--theme-accent);
+}
+
+.control-btn.tertiary:hover:not(:disabled) {
+    background: var(--theme-accent);
+    box-shadow: 0 0 20px var(--theme-accent);
+}
+
+/* ============================
+   ANIMACIONES AVANZADAS
+   ============================ */
+
+/* Partículas de fondo */
+.particles {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: -1;
+}
+
+.particle {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background: var(--theme-primary);
+    border-radius: 50%;
+    animation: float 6s infinite linear;
+    opacity: 0.7;
+}
+
+@keyframes float {
+    0% {
+        transform: translateY(100vh) rotate(0deg);
+        opacity: 0;
+    }
+    10% {
+        opacity: 0.7;
+    }
+    90% {
+        opacity: 0.7;
+    }
+    100% {
+        transform: translateY(-10vh) rotate(360deg);
+        opacity: 0;
+    }
+}
+
+/* Animación de número contando */
+.counting-animation {
+    animation: countPulse 0.1s ease-in-out;
+}
+
+@keyframes countPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+    100% { transform: scale(1); }
+}
+
+/* Efecto de ondas al hacer clic */
+.ripple-effect {
+    position: relative;
+    overflow: hidden;
+}
+
+.ripple {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(0);
+    animation: rippleAnimation 0.6s linear;
+    pointer-events: none;
+}
+
+@keyframes rippleAnimation {
+    to {
+        transform: scale(4);
+        opacity: 0;
+    }
+}
+
+/* Animación de carga */
+.loading-animation {
+    position: relative;
+}
+
+.loading-animation::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+/* Animación de éxito */
+@keyframes successBounce {
+    0%, 100% { transform: scale(1) rotate(0deg); }
+    25% { transform: scale(1.1) rotate(-5deg); }
+    50% { transform: scale(1.2) rotate(0deg); }
+    75% { transform: scale(1.1) rotate(5deg); }
+}
+
+.success-animation {
+    animation: successBounce 0.6s ease-in-out;
+}
+
+/* Efecto de parpadeo suave para alertas */
+@keyframes softBlink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+.soft-blink {
+    animation: softBlink 1s ease-in-out infinite;
+}
+
+/* Animación de entrada mejorada para timers */
+@keyframes slideInScale {
+    0% {
+        transform: translateY(50px) scale(0.8);
+        opacity: 0;
+    }
+    50% {
+        transform: translateY(-10px) scale(1.05);
+    }
+    100% {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+    }
+}
+
+.timer-card {
+    animation: slideInScale 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* Hover avanzado para botones */
+.control-btn {
+    position: relative;
+    overflow: hidden;
+}
+
+.control-btn::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, transparent 70%);
+    transition: all 0.5s;
+    transform: translate(-50%, -50%);
+}
+
+.control-btn:hover::after {
+    width: 200px;
+    height: 200px;
+}
+
+/* Animación de progreso circular */
+.circular-progress {
+    position: relative;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: conic-gradient(var(--theme-primary) 0deg, transparent 0deg);
+    transition: background 0.3s ease;
+}
+
+/* Efectos de neón mejorados */
+.neon-glow {
+    animation: neonPulse 3s ease-in-out infinite alternate;
+}
+
+@keyframes neonPulse {
+    0% {
+        text-shadow: 
+            0 0 5px currentColor,
+            0 0 10px currentColor,
+            0 0 15px currentColor,
+            0 0 20px currentColor;
+    }
+    100% {
+        text-shadow: 
+            0 0 10px currentColor,
+            0 0 20px currentColor,
+            0 0 30px currentColor,
+            0 0 40px currentColor,
+            0 0 50px currentColor;
+    }
+}
+
+/* Selector de temas */
+.theme-selector {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 1000;
+    background: rgba(0, 0, 0, 0.8);
+    padding: 15px;
+    border-radius: var(--border-radius);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.theme-selector h4 {
+    color: var(--theme-text);
+    margin-bottom: 10px;
+    font-size: 0.9rem;
+    text-align: center;
+}
+
+.theme-buttons {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.theme-btn {
+    width: 30px;
+    height: 30px;
+    border: 2px solid transparent;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.3s;
+    position: relative;
+}
+
+.theme-btn.active {
+    border-color: var(--theme-text);
+    transform: scale(1.1);
+}
+
+.theme-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+}
+
+.theme-btn.dark { background: linear-gradient(45deg, #0a0a0a, #00ff00); }
+.theme-btn.light { background: linear-gradient(45deg, #f0f0f0, #333333); }
+.theme-btn.gaming { background: linear-gradient(45deg, #0f0023, #ff00ff); }
+.theme-btn.matrix { background: linear-gradient(45deg, #000000, #00ff41); }
+.theme-btn.ocean { background: linear-gradient(45deg, #001122, #00ddff); }
+.theme-btn.sunset { background: linear-gradient(45deg, #2d1b30, #ff6b9d); }
+
+/* Animaciones de microinteracciones */
+.microinteraction {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.microinteraction:active {
+    transform: scale(0.98);
+}
+
+/* Efecto de typing para textos */
+.typing-effect {
+    overflow: hidden;
+    border-right: 2px solid var(--theme-primary);
+    white-space: nowrap;
+    animation: typing 2s steps(40, end), blink-caret 0.75s step-end infinite;
+}
+
+@keyframes typing {
+    from { width: 0; }
+    to { width: 100%; }
+}
+
+@keyframes blink-caret {
+    from, to { border-color: transparent; }
+    50% { border-color: var(--theme-primary); }
+}
+
+/* Mejoras responsive para animaciones */
+@media (max-width: 768px) {
+    .timer-card {
+        animation-duration: 0.4s;
+    }
+    
+    .theme-selector {
+        position: relative;
+        margin-bottom: 20px;
+    }
+    
+    .particles {
+        display: none; /* Optimización para móviles */
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+    
+    .particles {
+        display: none;
+    }
+} 

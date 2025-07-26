@@ -314,6 +314,318 @@ class ExportService {
 }
 
 // ============================
+// GESTOR DE TEMAS AVANZADO
+// ============================
+
+/**
+ * Maneja los temas visuales de la aplicación
+ */
+class ThemeManager {
+    constructor() {
+        this.currentTheme = 'dark';
+        this.themes = ['dark', 'light', 'gaming', 'matrix', 'ocean', 'sunset'];
+        this.loadTheme();
+        this.initThemeSelector();
+    }
+
+    loadTheme() {
+        try {
+            const saved = localStorage.getItem('retro-timer-theme');
+            if (saved && this.themes.includes(saved)) {
+                this.currentTheme = saved;
+            }
+        } catch (e) {
+            console.warn('No se pudo cargar el tema:', e);
+        }
+        this.applyTheme(this.currentTheme);
+    }
+
+    saveTheme() {
+        try {
+            localStorage.setItem('retro-timer-theme', this.currentTheme);
+        } catch (e) {
+            console.warn('No se pudo guardar el tema:', e);
+        }
+    }
+
+    applyTheme(themeName) {
+        if (!this.themes.includes(themeName)) return;
+
+        // Remover todos los temas
+        document.body.classList.remove(...this.themes.map(t => `${t}-theme`));
+        
+        // Aplicar nuevo tema
+        if (themeName !== 'dark') {
+            document.body.classList.add(`${themeName}-theme`);
+        }
+
+        this.currentTheme = themeName;
+        this.saveTheme();
+        this.updateThemeSelector();
+
+        // Regenerar partículas con el nuevo tema
+        if (window.particleSystem) {
+            window.particleSystem.updateTheme();
+        }
+    }
+
+    initThemeSelector() {
+        const buttons = document.querySelectorAll('.theme-btn');
+        buttons.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const theme = btn.classList[1]; // dark, light, gaming, etc.
+                this.applyTheme(theme);
+            });
+        });
+    }
+
+    updateThemeSelector() {
+        const buttons = document.querySelectorAll('.theme-btn');
+        buttons.forEach(btn => {
+            btn.classList.remove('active');
+            if (btn.classList.contains(this.currentTheme)) {
+                btn.classList.add('active');
+            }
+        });
+    }
+
+    getNextTheme() {
+        const currentIndex = this.themes.indexOf(this.currentTheme);
+        const nextIndex = (currentIndex + 1) % this.themes.length;
+        return this.themes[nextIndex];
+    }
+
+    cycleTheme() {
+        const nextTheme = this.getNextTheme();
+        this.applyTheme(nextTheme);
+    }
+}
+
+// ============================
+// SISTEMA DE PARTÍCULAS
+// ============================
+
+/**
+ * Sistema de partículas de fondo
+ */
+class ParticleSystem {
+    constructor() {
+        this.container = document.getElementById('particles-container');
+        this.particles = [];
+        this.maxParticles = 50;
+        this.animationId = null;
+        this.init();
+    }
+
+    init() {
+        if (!this.container) return;
+        
+        this.createParticles();
+        this.animate();
+    }
+
+    createParticles() {
+        for (let i = 0; i < this.maxParticles; i++) {
+            this.createParticle();
+        }
+    }
+
+    createParticle() {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        
+        // Posición aleatoria
+        particle.style.left = Math.random() * 100 + 'vw';
+        particle.style.animationDelay = Math.random() * 6 + 's';
+        particle.style.animationDuration = (4 + Math.random() * 4) + 's';
+        
+        // Tamaño aleatorio
+        const size = Math.random() * 3 + 1;
+        particle.style.width = size + 'px';
+        particle.style.height = size + 'px';
+        
+        this.container.appendChild(particle);
+        this.particles.push(particle);
+
+        // Remover cuando termine la animación
+        particle.addEventListener('animationend', () => {
+            if (particle.parentNode) {
+                particle.remove();
+                const index = this.particles.indexOf(particle);
+                if (index > -1) {
+                    this.particles.splice(index, 1);
+                }
+                // Crear nueva partícula
+                this.createParticle();
+            }
+        });
+    }
+
+    updateTheme() {
+        // Las partículas ya usan variables CSS que se actualizan automáticamente
+        this.particles.forEach(particle => {
+            particle.style.background = 'var(--theme-primary)';
+        });
+    }
+
+    destroy() {
+        if (this.animationId) {
+            cancelAnimationFrame(this.animationId);
+        }
+        this.particles.forEach(particle => particle.remove());
+        this.particles = [];
+    }
+
+    animate() {
+        // El sistema se auto-mantiene con CSS animations
+        this.animationId = requestAnimationFrame(() => this.animate());
+    }
+}
+
+// ============================
+// GESTOR DE ANIMACIONES
+// ============================
+
+/**
+ * Maneja animaciones y efectos visuales avanzados
+ */
+class AnimationManager {
+    constructor() {
+        this.setupRippleEffects();
+        this.setupCountingAnimations();
+    }
+
+    setupRippleEffects() {
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('ripple-effect')) {
+                this.createRipple(e);
+            }
+        });
+    }
+
+    createRipple(e) {
+        const button = e.target;
+        const rect = button.getBoundingClientRect();
+        const size = Math.max(rect.width, rect.height);
+        const x = e.clientX - rect.left - size / 2;
+        const y = e.clientY - rect.top - size / 2;
+
+        const ripple = document.createElement('span');
+        ripple.className = 'ripple';
+        ripple.style.width = ripple.style.height = size + 'px';
+        ripple.style.left = x + 'px';
+        ripple.style.top = y + 'px';
+
+        button.appendChild(ripple);
+
+        ripple.addEventListener('animationend', () => {
+            ripple.remove();
+        });
+    }
+
+    setupCountingAnimations() {
+        // Observador para detectar cambios en displays de tiempo
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.type === 'childList' || mutation.type === 'characterData') {
+                    const display = mutation.target.closest('.timer-display');
+                    if (display && !display.classList.contains('counting-animation')) {
+                        display.classList.add('counting-animation');
+                        setTimeout(() => {
+                            display.classList.remove('counting-animation');
+                        }, 100);
+                    }
+                }
+            });
+        });
+
+        // Observar todos los displays existentes y futuros
+        const observeDisplays = () => {
+            document.querySelectorAll('.timer-display').forEach(display => {
+                observer.observe(display, {
+                    childList: true,
+                    characterData: true,
+                    subtree: true
+                });
+            });
+        };
+
+        observeDisplays();
+        
+        // Re-observar cuando se añaden nuevos timers
+        const timerObserver = new MutationObserver(observeDisplays);
+        const container = document.getElementById('timers-container');
+        if (container) {
+            timerObserver.observe(container, { childList: true });
+        }
+    }
+
+    animateSuccess(element) {
+        element.classList.add('success-animation');
+        setTimeout(() => {
+            element.classList.remove('success-animation');
+        }, 600);
+    }
+
+    animateLoading(element, duration = 1500) {
+        element.classList.add('loading-animation');
+        setTimeout(() => {
+            element.classList.remove('loading-animation');
+        }, duration);
+    }
+
+    animateSoftBlink(element, duration = 3000) {
+        element.classList.add('soft-blink');
+        setTimeout(() => {
+            element.classList.remove('soft-blink');
+        }, duration);
+    }
+
+    createFloatingNumber(value, startElement) {
+        const floating = document.createElement('div');
+        floating.textContent = value;
+        floating.style.cssText = `
+            position: absolute;
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--theme-primary);
+            pointer-events: none;
+            z-index: 1000;
+            text-shadow: 0 0 10px currentColor;
+            animation: floatUp 2s ease-out forwards;
+        `;
+
+        const rect = startElement.getBoundingClientRect();
+        floating.style.left = (rect.left + rect.width / 2) + 'px';
+        floating.style.top = rect.top + 'px';
+
+        document.body.appendChild(floating);
+
+        // CSS para la animación
+        if (!document.getElementById('float-animation-style')) {
+            const style = document.createElement('style');
+            style.id = 'float-animation-style';
+            style.textContent = `
+                @keyframes floatUp {
+                    0% {
+                        transform: translateY(0) scale(1);
+                        opacity: 1;
+                    }
+                    100% {
+                        transform: translateY(-100px) scale(0.5);
+                        opacity: 0;
+                    }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+
+        setTimeout(() => floating.remove(), 2000);
+    }
+}
+
+// ============================
 // GESTOR PRINCIPAL DE TIMERS
 // ============================
 
@@ -328,6 +640,8 @@ class TimerManager {
         this.keyboardManager = new KeyboardManager(this);
         this.statsManager = new StatsManager();
         this.settingsManager = new SettingsManager();
+        this.themeManager = new ThemeManager();
+        this.animationManager = new AnimationManager();
         
         // Referencias DOM
         this.timersContainer = document.getElementById('timers-container');
@@ -403,7 +717,10 @@ class TimerManager {
      * Crea un nuevo cronómetro
      */
     createStopwatch() {
-        if (this.timers.size >= CONFIG.MAX_TIMERS) return;
+        if (this.timers.size >= CONFIG.MAX_TIMERS) {
+            this.showToast('Máximo de timers alcanzado', 'error');
+            return;
+        }
         
         const id = this.nextId++;
         const stopwatch = new Stopwatch(id);
@@ -412,6 +729,10 @@ class TimerManager {
         this.timers.set(id, stopwatch);
         this.renderTimer(stopwatch);
         this.updateUI();
+
+        // Animación de éxito
+        this.animationManager.animateSuccess(this.addStopwatchBtn);
+        this.showToast(`Cronómetro ${id} creado`, 'success');
     }
 
     /**
@@ -452,7 +773,10 @@ class TimerManager {
      * Crea una nueva cuenta regresiva
      */
     createCountdown(initialTimeMs) {
-        if (this.timers.size >= CONFIG.MAX_TIMERS) return;
+        if (this.timers.size >= CONFIG.MAX_TIMERS) {
+            this.showToast('Máximo de timers alcanzado', 'error');
+            return;
+        }
         
         const id = this.nextId++;
         const countdown = new Countdown(id, initialTimeMs);
@@ -461,6 +785,10 @@ class TimerManager {
         this.timers.set(id, countdown);
         this.renderTimer(countdown);
         this.updateUI();
+
+        // Animación de éxito
+        this.animationManager.animateSuccess(this.addCountdownBtn);
+        this.showToast(`Cuenta regresiva ${id} creada`, 'success');
     }
 
     /**
@@ -734,12 +1062,18 @@ class TimerManager {
      */
     exportTimes() {
         if (this.timers.size === 0) {
-            alert('No hay timers para exportar');
+            this.showToast('No hay timers para exportar', 'error');
             return;
         }
         
-        const timersArray = Array.from(this.timers.values());
-        ExportService.exportToCSV(timersArray);
+        // Animación de loading
+        this.animationManager.animateLoading(this.exportBtn, 1000);
+        
+        setTimeout(() => {
+            const timersArray = Array.from(this.timers.values());
+            ExportService.exportToCSV(timersArray);
+            this.showToast(`${timersArray.length} timers exportados`, 'success');
+        }, 500);
     }
 
     /**
@@ -749,23 +1083,43 @@ class TimerManager {
         const timerCount = this.timers.size;
         const maxReached = timerCount >= CONFIG.MAX_TIMERS;
         
-        // Actualizar contador
+        // Actualizar contador con animación
         if (this.timerCount) {
+            const oldCount = this.timerCount.textContent;
             this.timerCount.textContent = timerCount;
+            
+            if (oldCount !== timerCount.toString()) {
+                this.animationManager.createFloatingNumber(
+                    timerCount > oldCount ? '+1' : '-1',
+                    this.timerCount
+                );
+            }
         }
         
-        // Habilitar/deshabilitar botones
+        // Habilitar/deshabilitar botones con feedback visual
         if (this.addStopwatchBtn) {
+            const wasDisabled = this.addStopwatchBtn.disabled;
             this.addStopwatchBtn.disabled = maxReached;
+            
+            if (maxReached && !wasDisabled) {
+                this.animationManager.animateSoftBlink(this.addStopwatchBtn, 1000);
+            }
         }
+        
         if (this.addCountdownBtn) {
+            const wasDisabled = this.addCountdownBtn.disabled;
             this.addCountdownBtn.disabled = maxReached;
+            
+            if (maxReached && !wasDisabled) {
+                this.animationManager.animateSoftBlink(this.addCountdownBtn, 1000);
+            }
         }
+        
         if (this.exportBtn) {
             this.exportBtn.disabled = timerCount === 0;
         }
         
-        // Mostrar/ocultar estado vacío
+        // Mostrar/ocultar estado vacío con animación
         if (this.emptyState) {
             this.emptyState.classList.toggle('hidden', timerCount > 0);
         }
@@ -834,6 +1188,14 @@ Total de Sesiones,${stats.totalSessions}`;
         document.body.removeChild(link);
         
         this.showToast('Estadísticas exportadas', 'success');
+    }
+
+    /**
+     * Cambia el tema de la aplicación
+     */
+    changeTheme(themeName) {
+        this.themeManager.applyTheme(themeName);
+        this.showToast(`Tema ${themeName} aplicado`, 'success');
     }
 }
 
@@ -1067,12 +1429,23 @@ let app;
 document.addEventListener('DOMContentLoaded', () => {
     app = new TimerManager();
     
+    // Inicializar sistema de partículas
+    window.particleSystem = new ParticleSystem();
+    
     // Habilitar botones inicialmente
     document.getElementById('add-stopwatch').disabled = false;
     document.getElementById('add-countdown').disabled = false;
     document.getElementById('export-times').disabled = true;
     
-    console.log('🕰️ Retro Timer Application initialized');
+    // Añadir atajo de teclado para cambiar tema
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 't' && !e.target.matches('input, textarea')) {
+            e.preventDefault();
+            app.themeManager.cycleTheme();
+        }
+    });
+    
+    console.log('🎨 Retro Timer Application initialized with advanced UI');
 });
 
 // ============================

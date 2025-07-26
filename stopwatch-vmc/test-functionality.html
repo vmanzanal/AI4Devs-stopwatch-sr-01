@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prueba de Funcionalidades - Retro Timer</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background: #1a1a1a;
+            color: #00ff00;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #00ff00;
+            border-radius: 8px;
+        }
+        .test-btn {
+            background: transparent;
+            border: 2px solid #00ff00;
+            color: #00ff00;
+            padding: 10px 20px;
+            margin: 5px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+        .test-btn:hover {
+            background: #00ff00;
+            color: #1a1a1a;
+        }
+        .success { color: #00ff00; }
+        .error { color: #ff0040; }
+        .info { color: #ffa500; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Prueba de Funcionalidades - Retro Timer</h1>
+    
+    <div class="test-section">
+        <h2>📊 Estado de la Aplicación</h2>
+        <p id="app-status" class="info">Verificando...</p>
+        <button class="test-btn" onclick="checkAppStatus()">Verificar Estado</button>
+    </div>
+
+    <div class="test-section">
+        <h2>🔊 Prueba de Sonidos</h2>
+        <p>Prueba los diferentes sonidos de alerta:</p>
+        <button class="test-btn" onclick="testTadaSound()">Ta-da!</button>
+        <button class="test-btn" onclick="testRetroSound()">Retro Game</button>
+        <button class="test-btn" onclick="testBoingSound()">Boing</button>
+        <button class="test-btn" onclick="testRandomSound()">Aleatorio</button>
+    </div>
+
+    <div class="test-section">
+        <h2>⏱️ Prueba de Formateo de Tiempo</h2>
+        <p>Formato MM:SS.ms:</p>
+        <p id="time-format-test" class="info">Probando formatos...</p>
+        <button class="test-btn" onclick="testTimeFormat()">Probar Formato</button>
+    </div>
+
+    <div class="test-section">
+        <h2>🎮 Funcionalidades Disponibles</h2>
+        <ul id="features-list">
+            <li>Cargando funcionalidades...</li>
+        </ul>
+        <button class="test-btn" onclick="checkFeatures()">Verificar Funcionalidades</button>
+    </div>
+
+    <div class="test-section">
+        <h2>🔗 Ir a la Aplicación Principal</h2>
+        <a href="index.html" class="test-btn" style="text-decoration: none; display: inline-block;">
+            🚀 Abrir Retro Timer
+        </a>
+    </div>
+
+    <script src="assets/alert-generator.js"></script>
+    <script src="script.js"></script>
+    <script>
+        // Funciones de prueba
+        function checkAppStatus() {
+            const statusEl = document.getElementById('app-status');
+            try {
+                if (typeof app !== 'undefined' && app) {
+                    statusEl.innerHTML = '<span class="success">✅ Aplicación cargada correctamente</span>';
+                } else if (typeof TimerManager !== 'undefined') {
+                    statusEl.innerHTML = '<span class="info">⚠️ Clases disponibles, pero app no inicializada (normal en esta página)</span>';
+                } else {
+                    statusEl.innerHTML = '<span class="error">❌ Error: Clases no encontradas</span>';
+                }
+            } catch (e) {
+                statusEl.innerHTML = '<span class="error">❌ Error: ' + e.message + '</span>';
+            }
+        }
+
+        function testTadaSound() {
+            try {
+                const generator = new AlertSoundGenerator();
+                generator.playTadaSound();
+                console.log('✅ Sonido Ta-da reproducido');
+            } catch (e) {
+                console.error('❌ Error reproduciendo Ta-da:', e);
+            }
+        }
+
+        function testRetroSound() {
+            try {
+                const generator = new AlertSoundGenerator();
+                generator.playRetroGameSound();
+                console.log('✅ Sonido Retro reproducido');
+            } catch (e) {
+                console.error('❌ Error reproduciendo Retro:', e);
+            }
+        }
+
+        function testBoingSound() {
+            try {
+                const generator = new AlertSoundGenerator();
+                generator.playBoingSound();
+                console.log('✅ Sonido Boing reproducido');
+            } catch (e) {
+                console.error('❌ Error reproduciendo Boing:', e);
+            }
+        }
+
+        function testRandomSound() {
+            try {
+                const generator = new AlertSoundGenerator();
+                generator.playRandomFunnySound();
+                console.log('✅ Sonido aleatorio reproducido');
+            } catch (e) {
+                console.error('❌ Error reproduciendo sonido aleatorio:', e);
+            }
+        }
+
+        function testTimeFormat() {
+            const testEl = document.getElementById('time-format-test');
+            const testTimes = [0, 1000, 59000, 60000, 3661000, 359999]; // Varios tiempos de prueba
+            
+            if (typeof Timer !== 'undefined') {
+                const results = testTimes.map(time => {
+                    const formatted = Timer.formatTime(time);
+                    return `${time}ms = ${formatted}`;
+                });
+                testEl.innerHTML = '<span class="success">✅ Formato correcto:</span><br>' + results.join('<br>');
+            } else {
+                testEl.innerHTML = '<span class="error">❌ Clase Timer no encontrada</span>';
+            }
+        }
+
+        function checkFeatures() {
+            const listEl = document.getElementById('features-list');
+            const features = [
+                { name: 'Clase Timer', check: () => typeof Timer !== 'undefined' },
+                { name: 'Clase Stopwatch', check: () => typeof Stopwatch !== 'undefined' },
+                { name: 'Clase Countdown', check: () => typeof Countdown !== 'undefined' },
+                { name: 'NotificationService', check: () => typeof NotificationService !== 'undefined' },
+                { name: 'ExportService', check: () => typeof ExportService !== 'undefined' },
+                { name: 'TimerManager', check: () => typeof TimerManager !== 'undefined' },
+                { name: 'AlertSoundGenerator', check: () => typeof AlertSoundGenerator !== 'undefined' },
+                { name: 'Web Audio API', check: () => typeof AudioContext !== 'undefined' || typeof webkitAudioContext !== 'undefined' }
+            ];
+
+            const featuresList = features.map(feature => {
+                const status = feature.check() ? '✅' : '❌';
+                const className = feature.check() ? 'success' : 'error';
+                return `<li><span class="${className}">${status} ${feature.name}</span></li>`;
+            }).join('');
+
+            listEl.innerHTML = featuresList;
+        }
+
+        // Ejecutar verificaciones automáticamente
+        setTimeout(() => {
+            checkAppStatus();
+            checkFeatures();
+            testTimeFormat();
+        }, 1000);
+    </script>
+</body>
+</html> 

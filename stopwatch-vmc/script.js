@@ -217,7 +217,7 @@ class Countdown extends Timer {
  */
 class NotificationService {
     constructor() {
-        this.audioElement = document.getElementById('alert-sound');
+        this.soundGenerator = new AlertSoundGenerator();
         this.hasPermission = false;
         this.init();
     }
@@ -227,11 +227,6 @@ class NotificationService {
         if ('Notification' in window) {
             const permission = await Notification.requestPermission();
             this.hasPermission = permission === 'granted';
-        }
-        
-        // Configurar audio
-        if (this.audioElement) {
-            this.audioElement.volume = CONFIG.AUDIO_VOLUME;
         }
     }
 
@@ -249,14 +244,13 @@ class NotificationService {
     }
 
     /**
-     * Reproduce sonido de alerta
+     * Reproduce sonido de alerta gracioso
      */
     playAlert() {
-        if (this.audioElement) {
-            this.audioElement.currentTime = 0;
-            this.audioElement.play().catch(e => {
-                console.warn('No se pudo reproducir el sonido:', e);
-            });
+        try {
+            this.soundGenerator.playRandomFunnySound();
+        } catch (e) {
+            console.warn('No se pudo reproducir el sonido:', e);
         }
     }
 

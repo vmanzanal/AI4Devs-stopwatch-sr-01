@@ -26,15 +26,15 @@ stopwatch-vmc/
 
 ## 🚀 Fases de Desarrollo
 
-### **Fase 1: Estructura Base (30 min)**
-- [ ] Crear el layout HTML principal
-- [ ] Implementar CSS con diseño retro (display digital, botones grandes)
-- [ ] Configurar estructura básica de JavaScript
+### **Fase 1: Estructura Base (30 min)** ✅
+- [x] Crear el layout HTML principal
+- [x] Implementar CSS con diseño retro (display digital, botones grandes)
+- [x] Configurar estructura básica de JavaScript
 
-### **Fase 2: Funcionalidad Core (45 min)**
-- [ ] Implementar cronómetro básico (start/pause/reset)
-- [ ] Implementar cuenta regresiva básica
-- [ ] Crear sistema de gestión de tiempo preciso (formato MM:SS.ms)
+### **Fase 2: Funcionalidad Core (45 min)** ✅
+- [x] Implementar cronómetro básico (start/pause/reset)
+- [x] Implementar cuenta regresiva básica
+- [x] Crear sistema de gestión de tiempo preciso (formato MM:SS.ms)
 
 ### **Fase 3: Funcionalidades Avanzadas (45 min)**
 - [ ] Sistema multi-instancia (crear/eliminar hasta 3 timers)

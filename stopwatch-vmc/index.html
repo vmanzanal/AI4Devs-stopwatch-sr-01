@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cronómetro y Cuenta Regresiva Retro</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <h1 class="app-title">⏱️ RETRO TIMER</h1>
+            <p class="app-subtitle">Cronómetro y Cuenta Regresiva</p>
+        </header>
+
+        <!-- Control Panel -->
+        <div class="control-panel">
+            <button id="add-stopwatch" class="control-btn primary" disabled>
+                ➕ Agregar Cronómetro
+            </button>
+            <button id="add-countdown" class="control-btn secondary" disabled>
+                ⏰ Agregar Cuenta Regresiva
+            </button>
+            <button id="export-times" class="control-btn tertiary" disabled>
+                📊 Exportar CSV
+            </button>
+            <div class="timer-counter">
+                <span id="timer-count">0</span>/3 Timers
+            </div>
+        </div>
+
+        <!-- Timer Grid Container -->
+        <div id="timers-container" class="timers-grid">
+            <!-- Los timers se generarán dinámicamente aquí -->
+        </div>
+
+        <!-- Empty State -->
+        <div id="empty-state" class="empty-state">
+            <div class="empty-icon">⏱️</div>
+            <h2>No hay timers activos</h2>
+            <p>Agrega un cronómetro o cuenta regresiva para comenzar</p>
+        </div>
+
+        <!-- Modal para Configurar Cuenta Regresiva -->
+        <div id="countdown-modal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>⏰ Configurar Cuenta Regresiva</h3>
+                    <button id="close-modal" class="close-btn">✖</button>
+                </div>
+                <div class="modal-body">
+                    <div class="time-input-group">
+                        <label for="countdown-minutes">Minutos:</label>
+                        <input type="number" id="countdown-minutes" min="0" max="99" value="5">
+                    </div>
+                    <div class="time-input-group">
+                        <label for="countdown-seconds">Segundos:</label>
+                        <input type="number" id="countdown-seconds" min="0" max="59" value="0">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="cancel-countdown" class="control-btn secondary">Cancelar</button>
+                    <button id="create-countdown" class="control-btn primary">Crear</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="app-footer">
+            <p>© 2024 Retro Timer - Tecnología Vintage para el Futuro</p>
+        </footer>
+    </div>
+
+    <!-- Audio element para sonido de alerta -->
+    <audio id="alert-sound" preload="auto">
+        <source src="assets/alert.mp3" type="audio/mpeg">
+        Su navegador no soporta audio HTML5.
+    </audio>
+
+    <script src="script.js"></script>
+</body>
+</html>

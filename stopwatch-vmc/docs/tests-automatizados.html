@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tests Automatizados - Retro Timer</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+            color: #00ff00;
+            padding: 20px;
+            margin: 0;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .title {
+            font-size: 2.5rem;
+            text-shadow: 0 0 20px #00ff00;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            font-size: 1.2rem;
+            color: #cccccc;
+        }
+        .test-section {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid #00ff00;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            backdrop-filter: blur(10px);
+        }
+        .test-section h3 {
+            color: #ffa500;
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            text-shadow: 0 0 10px currentColor;
+        }
+        .test-btn {
+            background: transparent;
+            border: 2px solid #00ff00;
+            color: #00ff00;
+            padding: 12px 24px;
+            margin: 10px 5px;
+            cursor: pointer;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 1rem;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        .test-btn:hover {
+            background: #00ff00;
+            color: #000;
+            box-shadow: 0 0 20px #00ff00;
+            transform: translateY(-2px);
+        }
+        .test-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .test-btn.running {
+            border-color: #ffa500;
+            color: #ffa500;
+            animation: pulse 1s infinite;
+        }
+        .test-btn.success {
+            border-color: #00ff00;
+            background: rgba(0, 255, 0, 0.2);
+            color: #00ff00;
+        }
+        .test-btn.error {
+            border-color: #ff0040;
+            background: rgba(255, 0, 64, 0.2);
+            color: #ff0040;
+        }
+        .console-output {
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+            font-size: 0.9rem;
+            line-height: 1.4;
+            max-height: 400px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+        .results-summary {
+            background: rgba(0, 255, 255, 0.1);
+            border: 2px solid #00ffff;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .metric {
+            display: inline-block;
+            margin: 0 20px;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 5px;
+            min-width: 120px;
+        }
+        .metric-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #00ffff;
+            text-shadow: 0 0 10px currentColor;
+        }
+        .metric-label {
+            font-size: 0.9rem;
+            color: #cccccc;
+            text-transform: uppercase;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00ff00, #00ffff);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .controls {
+            text-align: center;
+            margin: 30px 0;
+        }
+        .status {
+            font-size: 1.1rem;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            text-align: center;
+        }
+        .status.idle {
+            background: rgba(255, 255, 255, 0.1);
+            color: #cccccc;
+        }
+        .status.running {
+            background: rgba(255, 165, 0, 0.2);
+            color: #ffa500;
+            animation: pulse 1s infinite;
+        }
+        .status.completed {
+            background: rgba(0, 255, 0, 0.2);
+            color: #00ff00;
+        }
+        .status.error {
+            background: rgba(255, 0, 64, 0.2);
+            color: #ff0040;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="title">🧪 Tests Automatizados</h1>
+            <p class="subtitle">Suite completa de testing para Retro Timer</p>
+        </div>
+
+        <div class="status idle" id="overall-status">
+            ⏳ Listo para ejecutar tests
+        </div>
+
+        <div class="controls">
+            <button class="test-btn" onclick="runAllTests()" id="run-all-btn">
+                🚀 Ejecutar Todos los Tests
+            </button>
+            <button class="test-btn" onclick="clearConsole()">
+                🗑️ Limpiar Consola
+            </button>
+            <button class="test-btn" onclick="downloadResults()">
+                💾 Descargar Resultados
+            </button>
+        </div>
+
+        <div class="results-summary" id="results-summary" style="display: none;">
+            <h3>📊 Resumen de Resultados</h3>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+            <div>
+                <div class="metric">
+                    <div class="metric-value" id="total-tests">0</div>
+                    <div class="metric-label">Total Tests</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value" id="passed-tests">0</div>
+                    <div class="metric-label">Pasados</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value" id="failed-tests">0</div>
+                    <div class="metric-label">Fallidos</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value" id="success-rate">0%</div>
+                    <div class="metric-label">Éxito</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>🔬 Tests Unitarios</h3>
+            <p>Tests de clases individuales y funciones específicas</p>
+            <button class="test-btn" onclick="runUnitTests()" id="unit-tests-btn">
+                ⚙️ Ejecutar Tests Unitarios
+            </button>
+            <div id="unit-tests-status"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>🔄 Tests de Integración</h3>
+            <p>Tests de flujos completos de usuario y interacciones entre componentes</p>
+            <button class="test-btn" onclick="runIntegrationTests()" id="integration-tests-btn">
+                🔗 Ejecutar Tests de Integración
+            </button>
+            <div id="integration-tests-status"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>🖥️ Tests de Funcionalidad</h3>
+            <p>Tests manuales y de características específicas</p>
+            <button class="test-btn" onclick="openFunctionalityTests()">
+                🎮 Abrir Tests de Funcionalidad
+            </button>
+        </div>
+
+        <div class="test-section">
+            <h3>📋 Consola de Resultados</h3>
+            <div class="console-output" id="console-output">
+                Listo para ejecutar tests...
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts de la aplicación -->
+    <script src="../app/assets/alert-generator.js"></script>
+    <script src="../app/script.js"></script>
+    <script src="../tests/unit-tests.js"></script>
+    <script src="../tests/integration-tests.js"></script>
+
+    <script>
+        // Estado global de testing
+        let testResults = {
+            unit: { passed: 0, failed: 0, completed: false },
+            integration: { passed: 0, failed: 0, completed: false }
+        };
+
+        // Referencias DOM
+        const consoleOutput = document.getElementById('console-output');
+        const overallStatus = document.getElementById('overall-status');
+        const resultsSummary = document.getElementById('results-summary');
+
+        // Interceptar console.log para mostrar en la página
+        const originalConsole = {
+            log: console.log,
+            error: console.error,
+            group: console.group,
+            groupEnd: console.groupEnd,
+            clear: console.clear
+        };
+
+        function interceptConsole() {
+            console.log = (...args) => {
+                originalConsole.log(...args);
+                appendToConsole(args.join(' '), 'log');
+            };
+
+            console.error = (...args) => {
+                originalConsole.error(...args);
+                appendToConsole(args.join(' '), 'error');
+            };
+
+            console.group = (label) => {
+                originalConsole.group(label);
+                appendToConsole(`▼ ${label}`, 'group');
+            };
+
+            console.groupEnd = () => {
+                originalConsole.groupEnd();
+                appendToConsole('', 'groupend');
+            };
+
+            console.clear = () => {
+                originalConsole.clear();
+                consoleOutput.textContent = '';
+            };
+        }
+
+        function appendToConsole(message, type = 'log') {
+            const timestamp = new Date().toLocaleTimeString();
+            let prefix = '';
+            let color = '#00ff00';
+
+            switch (type) {
+                case 'error':
+                    prefix = '❌';
+                    color = '#ff0040';
+                    break;
+                case 'group':
+                    prefix = '📁';
+                    color = '#ffa500';
+                    break;
+                case 'groupend':
+                    return; // No mostrar groupEnd
+                default:
+                    if (message.includes('✅')) {
+                        color = '#00ff00';
+                    } else if (message.includes('❌')) {
+                        color = '#ff0040';
+                    } else if (message.includes('📊') || message.includes('🎉')) {
+                        color = '#00ffff';
+                    }
+            }
+
+            const line = document.createElement('div');
+            line.style.color = color;
+            line.textContent = `[${timestamp}] ${prefix} ${message}`;
+            
+            consoleOutput.appendChild(line);
+            consoleOutput.scrollTop = consoleOutput.scrollHeight;
+        }
+
+        // Funciones de testing
+        async function runAllTests() {
+            updateStatus('running', '🔄 Ejecutando todos los tests...');
+            clearConsole();
+            
+            const runAllBtn = document.getElementById('run-all-btn');
+            runAllBtn.disabled = true;
+            runAllBtn.classList.add('running');
+
+            try {
+                await runUnitTests();
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                await runIntegrationTests();
+                
+                updateOverallResults();
+                updateStatus('completed', '✅ Todos los tests completados');
+            } catch (error) {
+                updateStatus('error', '❌ Error ejecutando tests');
+                console.error('Error en tests:', error);
+            } finally {
+                runAllBtn.disabled = false;
+                runAllBtn.classList.remove('running');
+            }
+        }
+
+        async function runUnitTests() {
+            const btn = document.getElementById('unit-tests-btn');
+            btn.disabled = true;
+            btn.classList.add('running');
+
+            try {
+                if (typeof window.runUnitTests === 'function') {
+                    console.log('🧪 Iniciando Tests Unitarios...');
+                    
+                    // Capturar resultados
+                    const originalResults = testFramework.results;
+                    testFramework.results = { passed: 0, failed: 0 };
+                    
+                    testFramework.runAll();
+                    
+                    testResults.unit = {
+                        passed: testFramework.results.passed,
+                        failed: testFramework.results.failed,
+                        completed: true
+                    };
+
+                    btn.classList.remove('running');
+                    btn.classList.add(testResults.unit.failed === 0 ? 'success' : 'error');
+                } else {
+                    throw new Error('Tests unitarios no disponibles');
+                }
+            } catch (error) {
+                console.error('Error en tests unitarios:', error);
+                btn.classList.remove('running');
+                btn.classList.add('error');
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        async function runIntegrationTests() {
+            const btn = document.getElementById('integration-tests-btn');
+            btn.disabled = true;
+            btn.classList.add('running');
+
+            try {
+                if (typeof window.runIntegrationTests === 'function') {
+                    console.log('🔄 Iniciando Tests de Integración...');
+                    
+                    // Capturar resultados
+                    integrationTestFramework.results = { passed: 0, failed: 0 };
+                    
+                    integrationTestFramework.runAll();
+                    
+                    testResults.integration = {
+                        passed: integrationTestFramework.results.passed,
+                        failed: integrationTestFramework.results.failed,
+                        completed: true
+                    };
+
+                    btn.classList.remove('running');
+                    btn.classList.add(testResults.integration.failed === 0 ? 'success' : 'error');
+                } else {
+                    throw new Error('Tests de integración no disponibles');
+                }
+            } catch (error) {
+                console.error('Error en tests de integración:', error);
+                btn.classList.remove('running');
+                btn.classList.add('error');
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        function openFunctionalityTests() {
+            window.open('../test-functionality.html', '_blank');
+        }
+
+        function updateOverallResults() {
+            const totalPassed = testResults.unit.passed + testResults.integration.passed;
+            const totalFailed = testResults.unit.failed + testResults.integration.failed;
+            const totalTests = totalPassed + totalFailed;
+            const successRate = totalTests > 0 ? Math.round((totalPassed / totalTests) * 100) : 0;
+
+            document.getElementById('total-tests').textContent = totalTests;
+            document.getElementById('passed-tests').textContent = totalPassed;
+            document.getElementById('failed-tests').textContent = totalFailed;
+            document.getElementById('success-rate').textContent = successRate + '%';
+
+            const progressFill = document.getElementById('progress-fill');
+            progressFill.style.width = successRate + '%';
+
+            resultsSummary.style.display = 'block';
+        }
+
+        function updateStatus(type, message) {
+            overallStatus.className = `status ${type}`;
+            overallStatus.textContent = message;
+        }
+
+        function clearConsole() {
+            console.clear();
+        }
+
+        function downloadResults() {
+            const totalPassed = testResults.unit.passed + testResults.integration.passed;
+            const totalFailed = testResults.unit.failed + testResults.integration.failed;
+            const totalTests = totalPassed + totalFailed;
+            const successRate = totalTests > 0 ? Math.round((totalPassed / totalTests) * 100) : 0;
+
+            const results = `RETRO TIMER - RESULTADOS DE TESTS
+=====================================
+Fecha: ${new Date().toLocaleString()}
+
+RESUMEN GENERAL:
+- Total de tests: ${totalTests}
+- Tests pasados: ${totalPassed}
+- Tests fallidos: ${totalFailed}
+- Porcentaje de éxito: ${successRate}%
+
+TESTS UNITARIOS:
+- Pasados: ${testResults.unit.passed}
+- Fallidos: ${testResults.unit.failed}
+- Estado: ${testResults.unit.completed ? 'Completado' : 'Pendiente'}
+
+TESTS DE INTEGRACIÓN:
+- Pasados: ${testResults.integration.passed}
+- Fallidos: ${testResults.integration.failed}
+- Estado: ${testResults.integration.completed ? 'Completado' : 'Pendiente'}
+
+CONSOLA:
+${consoleOutput.textContent}
+`;
+
+            const blob = new Blob([results], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `retro-timer-test-results-${new Date().toISOString().split('T')[0]}.txt`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', () => {
+            interceptConsole();
+            console.log('🧪 Suite de Tests Automatizados iniciada');
+            console.log('📋 Listo para ejecutar tests de Retro Timer');
+        });
+    </script>
+</body>
+</html> 
